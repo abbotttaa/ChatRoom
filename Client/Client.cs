@@ -15,12 +15,16 @@ namespace Client
 
         public void Run_SendReceive()
         {
-            Task.Run(() => Send());
-            Task receiveFinish = Task.Run(() => Recieve());
-            receiveFinish.Wait();
-            Run_SendReceive();
+            Parallel.Invoke( () =>
+                             {
+                                 Send();
+                             },
+                             () =>
+                             {
+                                 Recieve();
+                             }
+                            );
         }
-
         public Client(string IP, int port)
         {
             clientSocket = new TcpClient();
