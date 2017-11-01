@@ -16,7 +16,11 @@ namespace Server
         TcpListener server;
         public Server()
         {
+<<<<<<< HEAD
             server = new TcpListener(IPAddress.Parse("192.168.0.138"), 9999);
+=======
+            server = new TcpListener(IPAddress.Parse("192.168.0.131"), 9999);
+>>>>>>> 57efff9e54cef09688a82c72f0bb8db1217aaa60
             server.Start();
         }
         public void Run()

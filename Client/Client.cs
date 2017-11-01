@@ -15,6 +15,7 @@ namespace Client
 
         public void Run_SendReceive()
         {
+<<<<<<< HEAD
             Parallel.Invoke( () =>
                              {
                                  Send();
@@ -25,6 +26,14 @@ namespace Client
                              }
                             );
         }
+=======
+            Task.Run(() => Send());
+            Task receiveFinish = Task.Run(() => Recieve());
+            receiveFinish.Wait();
+            Run_SendReceive();
+        }
+
+>>>>>>> 57efff9e54cef09688a82c72f0bb8db1217aaa60
         public Client(string IP, int port)
         {
             clientSocket = new TcpClient();
