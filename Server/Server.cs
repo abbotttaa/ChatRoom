@@ -16,7 +16,7 @@ namespace Server
         TcpListener server;
         public Server()
         {
-            server = new TcpListener(IPAddress.Parse("192.168.0.131"), 9999);
+            server = new TcpListener(IPAddress.Parse("192.168.0.109"), 9999);//IPAddress.Any, Will allow you to connect multiple people 
             server.Start();
         }
         public void Run()
