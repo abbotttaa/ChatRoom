@@ -34,7 +34,9 @@ namespace Server
                 stream.Read(recievedMessage, 0, recievedMessage.Length);
                 string recievedMessageString = Encoding.ASCII.GetString(recievedMessage);
                 Console.WriteLine(recievedMessageString);
+                
                 return recievedMessageString;
+
         }
 
     }
