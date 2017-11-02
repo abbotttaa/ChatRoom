@@ -16,7 +16,7 @@ namespace Server
         TcpListener server;
         public Server()
         {
-            server = new TcpListener(IPAddress.Parse("192.168.0.138"), 9999);
+            server = new TcpListener(IPAddress.Any, 9999);
             server.Start();
         }
         public void Run()
@@ -26,9 +26,15 @@ namespace Server
             while (true)
             {
                 string message = client.Recieve();
-                Respond(message);
+                //queue 
+                Queue<string> Q = new Queue<string>();
+                Q.Enqueue(message);
+                //sql 
+                Respond(Q.Dequeue());
             }
          }
+        
+
         private void AcceptClient()
         {
             TcpClient clientSocket = default(TcpClient);

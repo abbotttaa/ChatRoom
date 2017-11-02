@@ -16,6 +16,7 @@ namespace Server
         {
             stream = Stream;
             client = Client;
+            Console.WriteLine();
             UserId = "495933b6-1762-47a1-b655-483510072e73";
         }
         public void Send(string Message)
