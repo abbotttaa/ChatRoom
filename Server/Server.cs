@@ -17,15 +17,18 @@ namespace Server
         public Server()
         {
             server = new TcpListener(IPAddress.Parse("192.168.0.109"), 9999);//IPAddress.Any, Will allow you to connect multiple people 
-
             server.Start();
         }
         public void Run()
         {
             AcceptClient();
-            string message = client.Recieve();
-            Respond(message);
-        }
+
+            while (true)
+            {
+                string message = client.Recieve();
+                Respond(message);
+            }
+         }
         private void AcceptClient()
         {
             TcpClient clientSocket = default(TcpClient);
