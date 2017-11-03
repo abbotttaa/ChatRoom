@@ -17,26 +17,71 @@ namespace Server
         TcpListener server;
         public Server()
         {
-            server = new TcpListener(IPAddress.Parse("192.168.0.109"), 9999);//IPAddress.Any, Will allow you to connect multiple people 
+
+            server = new TcpListener(IPAddress.Any, 9999);
             server.Start();
         }
         public void Run()
         {
-            AcceptClient();
-
+            Parallel.Invoke(() =>
+                                {
+                                    ListeningForClient();
+                                },
+                                () =>
+                                {
+                                    ListenForMessages();
+                                }
+                                );
+        }
+            //var clientThread = new Thread(() => ListeningForClient());
+            //ListeningForClient();
+            //var serverThread = new Thread(() => ListenForMessages());
+            //ListenForMessages();
+        
+       
+        //public void SendQueuedMessage(string message, Queue<string> Q)
+        //{
+        //    Object locker = new Object();
+        //        if (Q != null)
+        //        {      
+        //            Respond(Q.Dequeue());
+        //        }
+        //}
+        public void ListenForMessages()
+        {
+            Queue<string> Q = new Queue<string>();
             while (true)
             {
-                string message = client.Recieve();
-                Respond(message);
+                //string message = client.Recieve();
+                if (client.Recieve() != null)
+                {
+                    string message = client.Recieve();
+                    Q.Enqueue(message);
+                    Respond(Q.Dequeue());
+                    message = null;
+                }
             }
-         }
-        private void AcceptClient()
+        }
+
+
+        private void ListeningForClient()
+        {
+            while (true)
+            {
+                if (server.Pending() == true)
+                {
+                    clientFound();
+                }
+            }
+        }
+        private Client clientFound()
         {
             TcpClient clientSocket = default(TcpClient);
             clientSocket = server.AcceptTcpClient();
             Console.WriteLine("Connected");
+            // loop dict. to notify someone has logged in.
             NetworkStream stream = clientSocket.GetStream();
-            client = new Client(stream, clientSocket);
+            return client = new Client(stream, clientSocket);
         }
         private void Respond(string body)
         {

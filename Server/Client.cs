@@ -16,6 +16,7 @@ namespace Server
         {
             stream = Stream;
             client = Client;
+            Console.WriteLine();
             UserId = "495933b6-1762-47a1-b655-483510072e73";
         }
         public void Send(string Message)
@@ -33,7 +34,9 @@ namespace Server
                 stream.Read(recievedMessage, 0, recievedMessage.Length);
                 string recievedMessageString = Encoding.ASCII.GetString(recievedMessage);
                 Console.WriteLine(recievedMessageString);
+                
                 return recievedMessageString;
+
         }
 
     }
