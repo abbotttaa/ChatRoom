@@ -14,22 +14,17 @@ namespace Server
     {
         public static Client client;
         TcpListener server;
+        Queue<string> queue;
         public Server()
         {
             server = new TcpListener(IPAddress.Any, 9999);
             server.Start();
+            queue = new Queue<string>();
         }
         public void Run()
         {
-            Parallel.Invoke(() =>
-                                {
-                                    ListeningForClient();
-                                },
-                                () =>
-                                {
-                                    ListenForMessages();
-                                }
-                                );
+            Task.Run(() => ListenForMessages());
+            Task.Run(() => ListeningForClient() );          
         }
             //var clientThread = new Thread(() => ListeningForClient());
             //ListeningForClient();
@@ -47,15 +42,15 @@ namespace Server
         //}
         public void ListenForMessages()
         {
-            Queue<string> Q = new Queue<string>();
+            
             while (true)
             {
                 //string message = client.Recieve();
                 if (client.Recieve() != null)
                 {
                     string message = client.Recieve();
-                    Q.Enqueue(message);
-                    Respond(Q.Dequeue());
+                    queue.Enqueue(message);
+                    Respond(queue.Dequeue());
                     message = null;
                 }
             }
@@ -79,7 +74,7 @@ namespace Server
             Console.WriteLine("Connected");
             // loop dict. to notify someone has logged in.
             NetworkStream stream = clientSocket.GetStream();
-            return client = new Client(stream, clientSocket);
+            return new Client(stream, clientSocket);
         }
         private void Respond(string body)
         {
