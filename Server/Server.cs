@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Server   
 {
-    class Server : IDictionary;
+    class Server
     {
         public static Client client;
         TcpListener server;
@@ -23,15 +23,8 @@ namespace Server
         }
         public void Run()
         {
-            Parallel.Invoke(() =>
-                                {
-                                    ListeningForClient();
-                                },
-                                () =>
-                                {
-                                    ListenForMessages();
-                                }
-                                );
+            Task.Run(() => ListeningForClient());
+            Task.Run(() => ListenForMessages());
         }
             //var clientThread = new Thread(() => ListeningForClient());
             //ListeningForClient();
