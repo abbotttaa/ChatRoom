@@ -15,66 +15,66 @@ namespace Server
     {
         public static Client client;
         TcpListener server;
+        Queue<string> messageQueue;
+        Dictionary<int, Client> users;
+        int clientID = 0;
         public Server()
         {
 
             server = new TcpListener(IPAddress.Any, 9999);
+            messageQueue = new Queue<string>();
+            users = new Dictionary<int, Client>();
             server.Start();
         }
         public void Run()
         {
-            Task.Run(() => ListeningForClient());
-            Task.Run(() => ListenForMessages());
+
+            Task.Run(() =>ListeningForClient());
         }
-            //var clientThread = new Thread(() => ListeningForClient());
-            //ListeningForClient();
-            //var serverThread = new Thread(() => ListenForMessages());
-            //ListenForMessages();
-        
-       
-        //public void SendQueuedMessage(string message, Queue<string> Q)
-        //{
-        //    Object locker = new Object();
-        //        if (Q != null)
-        //        {      
-        //            Respond(Q.Dequeue());
-        //        }
-        //}
-        public void ListenForMessages()
+        private void AddUserToDictionary(Client client)
         {
-            Queue<string> Q = new Queue<string>();
+            users.Add(clientID, client);
+            client.UserId = clientID;
+            clientID++;
+        }
+
+        public void ListenForMessages(TcpClient clientSocket, Client client)
+        {
+            
             while (true)
             {
-                //string message = client.Recieve();
-                if (client.Recieve() != null)
-                {
-                    string message = client.Recieve();
-                    Q.Enqueue(message);
-                    Respond(Q.Dequeue());
-                    message = null;
-                }
+                Task<string> message = Task.Run(() => client.Recieve());
+                message.Wait();
+                Task<string>[] messages = new Task<string>[] { message };
+                string nextMessage = messages[0].Result;
+                messageQueue.Enqueue(nextMessage);
+                Respond(messageQueue.Dequeue());
+                //message = null;
+
             }
         }
-
-
         private void ListeningForClient()
         {
             while (true)
             {
                 if (server.Pending() == true)
                 {
-                    clientFound();
+                    clientFoundAndAdding();
                 }
             }
         }
-        private Client clientFound()
+        private Client clientFoundAndAdding()
         {
             TcpClient clientSocket = default(TcpClient);
             clientSocket = server.AcceptTcpClient();
             Console.WriteLine("Connected");
             // loop dict. to notify someone has logged in.
             NetworkStream stream = clientSocket.GetStream();
-            return client = new Client(stream, clientSocket);
+            Client newClient = new Client(stream, clientSocket);
+            AddUserToDictionary(newClient);
+            Task.Run(() => ListenForMessages(clientSocket, client));
+            return newClient;
+            
         }
         private void Respond(string body)
         {
